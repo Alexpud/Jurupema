@@ -1,7 +1,7 @@
 ﻿using Azure.Identity;
 using Azure.Storage.Blobs;
 
-namespace Jurupema.Api.Infrastructure.Files;
+namespace Jurupema.Api.Infrastructure.Storage;
 
 public class BlobStorageClient : IStorageClient
 {

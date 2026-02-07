@@ -1,6 +1,6 @@
 using Azure.Identity;
 using Azure.Storage.Blobs;
-using Jurupema.Api.Infrastructure.Files;
+using Jurupema.Api.Infrastructure.Storage;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;

@@ -1,5 +1,4 @@
-﻿
-namespace Jurupema.Api.Infrastructure.Files;
+﻿namespace Jurupema.Api.Infrastructure.Storage;
 
 public interface IStorageClient
 {

@@ -1,5 +1,5 @@
 using Jurupema.Api.Infrastructure.Data;
-using Jurupema.Api.Infrastructure.Files;
+using Jurupema.Api.Infrastructure.Storage;
 using Jurupema.Api.Presentation;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore;

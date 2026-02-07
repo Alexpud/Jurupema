@@ -1,4 +1,4 @@
-﻿using Jurupema.Api.Infrastructure.Files;
+﻿using Jurupema.Api.Infrastructure.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
