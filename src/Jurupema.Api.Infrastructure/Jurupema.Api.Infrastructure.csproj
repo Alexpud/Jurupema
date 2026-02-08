@@ -15,6 +15,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\src\Jurupema.Api.Domain\Jurupema.Api.Domain.csproj" />
+	  <ProjectReference Include="..\Jurupema.Api.Domain\Jurupema.Api.Domain.csproj" />
 	</ItemGroup>
 </Project>

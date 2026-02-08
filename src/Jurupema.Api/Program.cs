@@ -1,3 +1,4 @@
+using Jurupema.Api.Infrastructure;
 using Jurupema.Api.Infrastructure.Data;
 using Jurupema.Api.Infrastructure.Storage;
 using Jurupema.Api.Presentation;
@@ -19,9 +20,8 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddAntiforgery();
+builder.Services.RegisterServices(builder.Configuration);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

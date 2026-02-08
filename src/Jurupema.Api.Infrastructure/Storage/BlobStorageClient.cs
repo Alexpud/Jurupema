@@ -1,25 +1,27 @@
 ﻿using Azure.Identity;
 using Azure.Storage.Blobs;
+using Jurupema.Api.Infrastructure.Configurations;
+using Microsoft.Extensions.Options;
 
 namespace Jurupema.Api.Infrastructure.Storage;
 
 public class BlobStorageClient : IStorageClient
 {
     private readonly BlobServiceClient _blobServiceClient;
-    public BlobStorageClient()
+    private readonly BlobStorageConfiguration _blobStorageConfig;
+
+    public BlobStorageClient(IOptions<StorageConfiguration> options)
     {
+        _blobStorageConfig = options.Value.BlobStorageConfig;
         _blobServiceClient = new BlobServiceClient(
-            new Uri("https://stjurupemabrazil.blob.core.windows.net"),
+            new Uri($"https://{_blobStorageConfig.StorageAccountName}.blob.core.windows.net"),
             new DefaultAzureCredential());
     }
 
     public async Task UploadFile(Stream file, string fileName)
     {
-        var containerExists = await _blobServiceClient.GetBlobContainerClient("files-container").ExistsAsync();
-        if (!containerExists) 
-            await _blobServiceClient.CreateBlobContainerAsync("files-container");
-
-        var containerClient = _blobServiceClient.GetBlobContainerClient("files-container");
+        await _blobServiceClient.GetBlobContainerClient(_blobStorageConfig.ContainerName).CreateIfNotExistsAsync();
+        var containerClient = _blobServiceClient.GetBlobContainerClient(_blobStorageConfig.ContainerName);
         await containerClient.UploadBlobAsync(fileName, file);
     }
 }
