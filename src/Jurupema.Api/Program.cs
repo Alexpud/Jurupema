@@ -21,7 +21,7 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 builder.Services.AddAntiforgery();
-builder.Services.RegisterServices(builder.Configuration);
+builder.RegisterServices();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

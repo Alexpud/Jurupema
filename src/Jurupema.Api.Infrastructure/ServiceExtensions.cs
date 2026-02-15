@@ -1,20 +1,24 @@
 ﻿using Jurupema.Api.Infrastructure.Configurations;
 using Jurupema.Api.Infrastructure.Data;
 using Jurupema.Api.Infrastructure.Storage;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Jurupema.Api.Infrastructure;
 
 public static class ServiceExtensions
 {
-    public static IServiceCollection RegisterServices(this IServiceCollection services, IConfiguration configuration)
+    public static WebApplicationBuilder RegisterServices(this WebApplicationBuilder builder)
     {
-        services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
-        services.Configure<StorageConfiguration>(configuration.GetSection(StorageConfiguration.Position));
-        services.AddSingleton<IStorageClient, BlobStorageClient>();
-        return services;
+        builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("jurupema-db")));
+        builder.Services.Configure<StorageConfiguration>(builder.Configuration.GetSection(StorageConfiguration.Position));
+        builder.Services.AddSingleton<IStorageClient, BlobStorageClient>();
+        builder.AddServiceDefaults();
+        
+        return builder;
     }
 }
