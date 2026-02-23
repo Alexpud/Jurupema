@@ -1,5 +1,6 @@
 ﻿using Azure.Identity;
 using Azure.Storage.Blobs;
+using Jurupema.Api.Application.Storage;
 using Jurupema.Api.Infrastructure.Configurations;
 using Microsoft.Extensions.Options;
 
@@ -18,7 +19,7 @@ public class BlobStorageClient : IStorageClient
             new DefaultAzureCredential());
     }
 
-    public async Task UploadFile(Stream file, string fileName)
+    public async Task UploadFileAsync(Stream file, string fileName)
     {
         await _blobServiceClient.GetBlobContainerClient(_blobStorageConfig.ContainerName).CreateIfNotExistsAsync();
         var containerClient = _blobServiceClient.GetBlobContainerClient(_blobStorageConfig.ContainerName);

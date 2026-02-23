@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Jurupema.Api.Infrastructure.Migrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
+    [DbContext(typeof(JurupemaDbContext))]
     [Migration("20260125214859_Initial")]
     partial class Initial
     {

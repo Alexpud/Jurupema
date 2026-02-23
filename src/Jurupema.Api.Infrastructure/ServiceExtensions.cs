@@ -1,5 +1,9 @@
-﻿using Jurupema.Api.Infrastructure.Configurations;
+﻿using Jurupema.Api.Application.Products;
+using Jurupema.Api.Application.Storage;
+using Jurupema.Api.Domain.Repositories;
+using Jurupema.Api.Infrastructure.Configurations;
 using Jurupema.Api.Infrastructure.Data;
+using Jurupema.Api.Infrastructure.Data.Repositories;
 using Jurupema.Api.Infrastructure.Storage;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
@@ -13,12 +17,25 @@ public static class ServiceExtensions
 {
     public static WebApplicationBuilder RegisterServices(this WebApplicationBuilder builder)
     {
-        builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        // Infra
+        builder.Services.AddDbContext<JurupemaDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("jurupema-db")));
         builder.Services.Configure<StorageConfiguration>(builder.Configuration.GetSection(StorageConfiguration.Position));
         builder.Services.AddSingleton<IStorageClient, BlobStorageClient>();
+        builder.Services.AddScoped<IProductRepository, ProductRepository>();
         builder.AddServiceDefaults();
+
+        // Application
+        builder.Services.AddScoped<ProductService>();
+
         
         return builder;
+    }
+
+    public static async Task RunMigrationsAsync(this WebApplication builder)
+    {
+        using var scope = builder.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<JurupemaDbContext>();
+        await dbContext.Database.MigrateAsync();
     }
 }

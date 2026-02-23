@@ -22,6 +22,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\Jurupema.Api.Application\Jurupema.Api.Application.csproj" />
 	  <ProjectReference Include="..\Jurupema.Api.Domain\Jurupema.Api.Domain.csproj" />
 	  <ProjectReference Include="..\Jurupema.Aspire.ServiceDefaults\Jurupema.Aspire.ServiceDefaults.csproj" />
 	</ItemGroup>
