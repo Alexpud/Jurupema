@@ -1,4 +1,6 @@
-﻿using Jurupema.Api.Application.Products;
+﻿using FluentValidation;
+using Jurupema.Api.Application.Models;
+using Jurupema.Api.Application.Products;
 using Jurupema.Api.Application.Storage;
 using Jurupema.Api.Domain.Repositories;
 using Jurupema.Api.Infrastructure.Configurations;
@@ -6,6 +8,7 @@ using Jurupema.Api.Infrastructure.Data;
 using Jurupema.Api.Infrastructure.Data.Repositories;
 using Jurupema.Api.Infrastructure.Storage;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,8 +30,8 @@ public static class ServiceExtensions
 
         // Application
         builder.Services.AddScoped<ProductService>();
+        builder.Services.AddValidatorsFromAssemblyContaining<CreateProductParameterValidator>();
 
-        
         return builder;
     }
 

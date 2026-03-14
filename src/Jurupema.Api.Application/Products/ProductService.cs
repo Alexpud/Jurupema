@@ -8,9 +8,7 @@ public class ProductService(IStorageClient storageClient, IProductRepository pro
 {
     public async Task UploadProductImageAsync(int productId, string fileName, Stream fileStream)
     {
-        var product = await productRepository.GetByIdAsync(productId, p => p.ProductImages);
-        if (product is null)
-            throw new Exception("Product not found");
+        var product = await productRepository.GetByIdAsync(productId, p => p.ProductImages) ?? throw new Exception("Product not found");
 
         string url = "";
         var productImage = new ProductImage(product.Id, fileName, url);
