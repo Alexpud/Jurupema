@@ -13,7 +13,8 @@ public static class ProductEndpoints
         var group = endpointBuilder.MapGroup("/products");
         group.MapPost("/", async ([FromBody] CreateProductParameter request, [FromServices] ProductService productService) =>
         {
-            return Results.Ok();
+            var result = await productService.CreateProduct(request);
+            return Results.Created($"/products/{result.Id}", result);
         })
             .WithFluentValidation<CreateProductParameter>()
             .WithDescription("Creates a new product")

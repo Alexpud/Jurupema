@@ -1,0 +1,51 @@
+---
+description: .NET test conventions—determinism, AAA, Assert.Multiple, builders
+globs: tests/**/*.cs
+alwaysApply: false
+---
+
+# .NET testing (Jurupema)
+
+## Determinism
+
+Tests must produce the same outcome on every run. Do not rely on unbounded randomness or wall-clock time without control.
+
+- Prefer a **fixed seed** for Bogus (e.g. `new Faker { Random = new Randomizer(12345) }` or a `const int` on the test class).
+- Avoid asserting on `DateTime.UtcNow` unless the clock is faked or the value is injected.
+- When random IDs are needed, derive them from the seeded faker or explicit constants—not `new Random()` per run without a seed.
+
+## Arrange, Act, Assert
+
+Structure each test with explicit phases and comments:
+
+```csharp
+// Arrange
+// ...
+
+// Act
+// ...
+
+// Assert
+// ...
+```
+
+Keep **Act** to a single logical behavior (one call or one `act` delegate for exception tests).
+
+## Multiple assertions
+
+When asserting more than one outcome in the same test, wrap checks in **`Assert.Multiple`** (xUnit v3) so all failures surface in one run:
+
+```csharp
+Assert.Multiple(
+    () => Assert.Equal(expectedA, actualA),
+    () => Assert.Equal(expectedB, actualB));
+```
+
+Use a single assertion when there is only one check.
+
+## Builders
+
+Encapsulate test data construction in **builder classes** under `tests/**/Builders/` (or the project’s agreed test folder). Tests should not duplicate long object initialization or Bogus field rules in every method.
+
+- Builders accept an optional **`Faker`** (or use a seeded instance) so the same seed flows through related entities in one test.
+- Expose fluent `With…` methods for the fields tests need to override; sensible defaults live in `Build()`.

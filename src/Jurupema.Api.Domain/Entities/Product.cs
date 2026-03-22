@@ -1,16 +1,22 @@
 namespace Jurupema.Api.Domain.Entities;
 
-public class Product
+public class Product(string name, string description, decimal price) : BaseEntity
 {
-    public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public string Description { get; set; }
-    public decimal Price { get; set; }
-    public int Stock { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public DateTime? UpdatedAt { get; set; }
+    public string Name { get; private set; } = name;
+    public string Description { get; set; } = description;
+    public decimal Price { get; private set; } = price;
+    public int Stock { get; private set; }
 
     public List<ProductImage> ProductImages { get; set; } = [];
+
+    public void Update(string name, string description, decimal price, int stock)
+    {
+        Name = name;
+        Description = description;
+        Price = price;
+        Stock = stock;
+        UpdatedAt = DateTime.UtcNow;
+    }
 
     public bool TryAddImage(string fileName, string url)
     {
@@ -26,14 +32,4 @@ public class Product
     {
         return ProductImages.Any(p => p.Url.Equals(productImage));
     }
-}
-
-public class ProductImage(int productId, string name, string url)
-{
-    public int Id { get; private set; }
-    public DateTime CreatedAt { get; private set; } = DateTime.Now;
-    public string Url { get; private set; } = url;
-    public string Name { get; private set; } = name;
-    public int ProductId { get; private set; } = productId;
-    public Product Product { get; private set; }
 }

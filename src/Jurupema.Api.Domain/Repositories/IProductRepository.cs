@@ -1,14 +1,7 @@
-﻿
-using Jurupema.Api.Domain.Entities;
-using System.Linq.Expressions;
+﻿using Jurupema.Api.Domain.Entities;
 
 namespace Jurupema.Api.Domain.Repositories;
 
-public interface IProductRepository
+public interface IProductRepository : IBaseRepository<Product>
 {
-    Task<Product> GetById(int productId);
-    Task<Product> GetByIdAsync<TProperty>(int productId, Expression<Func<Product, TProperty>> navigationPropertyPath) where TProperty : class;
-    void InsertProductImage(ProductImage productImage);
-    Task SaveChangesAsync();
 }
-
