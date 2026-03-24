@@ -31,7 +31,7 @@ jobs:
       run: dotnet test --no-build --verbosity normal --configuration Release
     
     - name: Publish
-      run: dotnet publish Jurupema.Api/Jurupema.Api.csproj --configuration Release --output Jurupema.Api/publish
+      run: dotnet publish src/Jurupema.Api/Jurupema.Api.csproj --configuration Release --output src/Jurupema.Api/publish
     
     # Docker Build and Push
     # Required secrets: DOCKERHUB_USERNAME and DOCKERHUB_TOKEN
@@ -47,6 +47,6 @@ jobs:
       if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
       uses: docker/build-push-action@v5
       with:
-        context: ./Jurupema.Api
+        context: ./src/Jurupema.Api
         push: true
         tags: spudin/jurupema.api:${{ github.sha }}
