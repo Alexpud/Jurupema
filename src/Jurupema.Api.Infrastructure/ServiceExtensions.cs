@@ -22,7 +22,7 @@ public static class ServiceExtensions
     {
         // Infra
         builder.Services.AddDbContext<JurupemaDbContext>(options =>
-            options.UseSqlServer(builder.Configuration.GetConnectionString("jurupema-db")));
+            options.UseSqlServer(builder.Configuration.GetConnectionString("database")));
         builder.Services.Configure<StorageConfiguration>(builder.Configuration.GetSection(StorageConfiguration.Position));
         builder.Services.AddSingleton<IStorageClient, BlobStorageClient>();
         builder.Services.AddScoped<IProductRepository, ProductRepository>();

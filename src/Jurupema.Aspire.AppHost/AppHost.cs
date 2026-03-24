@@ -9,7 +9,7 @@ var database = builder.AddSqlServer("jurupema-sqlServer", password: password)
     .WithDataVolume()
     .WithEndpoint(port: 1433, targetPort: 1433, name: "ssms", isProxied: false)
     .WithLifetime(ContainerLifetime.Persistent)
-    .AddDatabase("jurupema-db");
+    .AddDatabase("database");
 
 builder.AddProject<Jurupema_Api>("jurupema-api")
     .WithReference(database)
