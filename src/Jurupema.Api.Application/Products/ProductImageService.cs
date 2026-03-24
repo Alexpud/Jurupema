@@ -7,7 +7,7 @@ namespace Jurupema.Api.Application.Products;
 
 public class ProductImageService(IStorageClient storageClient, IProductRepository productRepository)
 {
-    public async Task DeleteProductImageAsync(int productId, int productImageId, CancellationToken cancellationToken = default)
+    public async Task DeleteProductImageAsync(Guid productId, Guid productImageId, CancellationToken cancellationToken = default)
     {
         var product = await productRepository.GetByIdAsync(productId, p => p.ProductImages)
             ?? throw new ProductNotFoundException(productId);
@@ -20,7 +20,7 @@ public class ProductImageService(IStorageClient storageClient, IProductRepositor
         await productRepository.SaveChangesAsync();
     }
 
-    public async Task UploadProductImageAsync(int productId, string fileName, Stream fileStream)
+    public async Task UploadProductImageAsync(Guid productId, string fileName, Stream fileStream)
     {
         var product = await productRepository.GetByIdAsync(productId, p => p.ProductImages)
             ?? throw new ProductNotFoundException(productId);

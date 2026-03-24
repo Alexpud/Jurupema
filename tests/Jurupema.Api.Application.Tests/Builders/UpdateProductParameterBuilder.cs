@@ -6,7 +6,7 @@ namespace Jurupema.Api.Application.Tests.Builders;
 public sealed class UpdateProductParameterBuilder
 {
     private readonly Faker _faker;
-    private int? _id;
+    private Guid? _id;
     private string? _name;
     private string? _description;
     private decimal? _price;
@@ -17,7 +17,7 @@ public sealed class UpdateProductParameterBuilder
         _faker = faker ?? new Faker();
     }
 
-    public UpdateProductParameterBuilder WithId(int id)
+    public UpdateProductParameterBuilder WithId(Guid id)
     {
         _id = id;
         return this;
@@ -49,7 +49,7 @@ public sealed class UpdateProductParameterBuilder
 
     public UpdateProductParameter Build() => new()
     {
-        Id = _id ?? _faker.Random.Int(1, int.MaxValue),
+        Id = _id ?? Guid.NewGuid(),
         Name = _name ?? _faker.Commerce.ProductName(),
         Description = _description ?? _faker.Lorem.Sentence(),
         Price = _price ?? _faker.Random.Decimal(1, 1000),

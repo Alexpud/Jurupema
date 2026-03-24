@@ -1,5 +1,4 @@
 using System.Linq.Expressions;
-using Bogus;
 using Jurupema.Api.Application.Exceptions;
 using Jurupema.Api.Application.Models;
 using Jurupema.Api.Application.Products;
@@ -9,24 +8,29 @@ using Jurupema.Api.Domain;
 using Jurupema.Api.Domain.Entities;
 using Jurupema.Api.Domain.Repositories;
 using Moq;
+using Moq.AutoMock;
 
 namespace Jurupema.Api.Application.Tests.Products;
 
 public class ProductServiceTests
 {
-    private const int TestDataSeed = 2_718_281;
+    private readonly AutoMocker _autoMocker;
+    private readonly ProductService _sut;
+
+    public ProductServiceTests()
+    {
+        _autoMocker = new AutoMocker();
+        _sut = _autoMocker.CreateInstance<ProductService>();
+    }
 
     [Fact]
     public async Task QueryProductsAsync_when_include_images_and_storage_returns_url_sets_image_url()
     {
         // Arrange
-        var faker = new Faker { Random = new Randomizer(TestDataSeed) };
-        var product = new ProductBuilder(faker).Build();
-        SetEntityId(product, 7);
+        var product = new ProductBuilder().Build();
         product.ProductImages.Add(new ProductImage(product.Id, "photo.jpg"));
 
-        var repo = new Mock<IProductRepository>();
-        repo
+        _autoMocker.GetMock<IProductRepository>()
             .Setup(r => r.GetPagedAsync(
                 null,
                 ProductSortBy.Name,
@@ -38,19 +42,17 @@ public class ProductServiceTests
             .ReturnsAsync(((IReadOnlyList<Product>)new List<Product> { product }, 1));
 
         var expectedUrl = "https://example.blob.core.windows.net/c/photo.jpg?sv=2021";
-        var storage = new Mock<IStorageClient>();
-        storage
+        _autoMocker.GetMock<IStorageClient>()
             .Setup(s => s.GetTemporaryReadUrlAsync(
                 "photo.jpg",
                 It.IsAny<TimeSpan>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedUrl);
 
-        var sut = new ProductService(storage.Object, repo.Object);
         var parameters = new QueryProductsParameters(IncludeImages: true);
 
         // Act
-        var page = await sut.QueryProductsAsync(parameters, CancellationToken.None);
+        var page = await _sut.QueryProductsAsync(parameters, CancellationToken.None);
 
         // Assert
         Assert.Multiple(
@@ -63,13 +65,10 @@ public class ProductServiceTests
     public async Task QueryProductsAsync_when_include_images_and_storage_returns_null_sets_image_url_null()
     {
         // Arrange
-        var faker = new Faker { Random = new Randomizer(TestDataSeed) };
-        var product = new ProductBuilder(faker).Build();
-        SetEntityId(product, 8);
+        var product = new ProductBuilder().Build();
         product.ProductImages.Add(new ProductImage(product.Id, "doc.png"));
 
-        var repo = new Mock<IProductRepository>();
-        repo
+        _autoMocker.GetMock<IProductRepository>()
             .Setup(r => r.GetPagedAsync(
                 null,
                 ProductSortBy.Name,
@@ -80,19 +79,17 @@ public class ProductServiceTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(((IReadOnlyList<Product>)new List<Product> { product }, 1));
 
-        var storage = new Mock<IStorageClient>();
-        storage
+        _autoMocker.GetMock<IStorageClient>()
             .Setup(s => s.GetTemporaryReadUrlAsync(
                 It.IsAny<string>(),
                 It.IsAny<TimeSpan>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(default(string));
 
-        var sut = new ProductService(storage.Object, repo.Object);
         var parameters = new QueryProductsParameters(IncludeImages: true);
 
         // Act
-        var page = await sut.QueryProductsAsync(parameters, CancellationToken.None);
+        var page = await _sut.QueryProductsAsync(parameters, CancellationToken.None);
 
         // Assert
         Assert.Null(page.Items[0].Images[0].Url);
@@ -102,13 +99,10 @@ public class ProductServiceTests
     public async Task QueryProductsAsync_when_exclude_images_does_not_request_read_urls()
     {
         // Arrange
-        var faker = new Faker { Random = new Randomizer(TestDataSeed) };
-        var product = new ProductBuilder(faker).Build();
-        SetEntityId(product, 9);
+        var product = new ProductBuilder().Build();
         product.ProductImages.Add(new ProductImage(product.Id, "x.png"));
 
-        var repo = new Mock<IProductRepository>();
-        repo
+        _autoMocker.GetMock<IProductRepository>()
             .Setup(r => r.GetPagedAsync(
                 null,
                 ProductSortBy.Name,
@@ -117,19 +111,17 @@ public class ProductServiceTests
                 20,
                 false,
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(((IReadOnlyList<Product>)new List<Product> { product }, 1));
+            .ReturnsAsync(([product], 1));
 
-        var storage = new Mock<IStorageClient>();
-        var sut = new ProductService(storage.Object, repo.Object);
         var parameters = new QueryProductsParameters(IncludeImages: false);
 
         // Act
-        var page = await sut.QueryProductsAsync(parameters, CancellationToken.None);
+        var page = await _sut.QueryProductsAsync(parameters, CancellationToken.None);
 
         // Assert
         Assert.Multiple(
             () => Assert.Empty(page.Items[0].Images),
-            () => storage.Verify(
+            () => _autoMocker.GetMock<IStorageClient>().Verify(
                 s => s.GetTemporaryReadUrlAsync(
                     It.IsAny<string>(),
                     It.IsAny<TimeSpan>(),
@@ -137,29 +129,19 @@ public class ProductServiceTests
                 Times.Never));
     }
 
-    private static void SetEntityId(Product product, int id)
-    {
-        var idProp = product.GetType().BaseType!.GetProperty("Id")!;
-        idProp.GetSetMethod(true)!.Invoke(product, [id]);
-    }
-
     [Fact]
     public async Task UpdateProductAsync_throws_when_product_not_found()
     {
         // Arrange
-        var faker = new Faker { Random = new Randomizer(TestDataSeed) };
-        var missingProductId = faker.Random.Int(500_000, int.MaxValue);
-        var repo = new Mock<IProductRepository>();
-        repo
+        var missingProductId = Guid.NewGuid();
+        _autoMocker.GetMock<IProductRepository>()
             .Setup(r => r.GetByIdAsync(missingProductId, It.IsAny<Expression<Func<Product, object>>>()))
             .ReturnsAsync((Product?)null);
 
-        var storage = new Mock<IStorageClient>();
-        var sut = new ProductService(storage.Object, repo.Object);
-        var parameter = new UpdateProductParameterBuilder(faker).WithId(missingProductId).Build();
+        var parameter = new UpdateProductParameterBuilder().WithId(missingProductId).Build();
 
         // Act
-        var act = async () => await sut.UpdateProductAsync(parameter);
+        var act = async () => await _sut.UpdateProductAsync(parameter);
 
         // Assert
         var ex = await Assert.ThrowsAsync<ProductNotFoundException>(act);
@@ -172,20 +154,15 @@ public class ProductServiceTests
     public async Task UpdateProductAsync_updates_fields_and_persists_when_product_exists()
     {
         // Arrange
-        var faker = new Faker { Random = new Randomizer(TestDataSeed) };
-        var productId = faker.Random.Int(1, 100_000);
-        var repo = new Mock<IProductRepository>();
-        var product = new ProductBuilder(faker).Build();
-        repo
-            .Setup(r => r.GetByIdAsync(productId, It.IsAny<Expression<Func<Product, object>>>()))
+        var product = new ProductBuilder().Build();
+        _autoMocker.GetMock<IProductRepository>()
+            .Setup(r => r.GetByIdAsync(product.Id, It.IsAny<Expression<Func<Product, object>>>()))
             .ReturnsAsync(product);
 
-        var storage = new Mock<IStorageClient>();
-        var sut = new ProductService(storage.Object, repo.Object);
-        var parameter = new UpdateProductParameterBuilder(faker).WithId(productId).Build();
+        var parameter = new UpdateProductParameterBuilder().WithId(product.Id).Build();
 
         // Act
-        await sut.UpdateProductAsync(parameter);
+        await _sut.UpdateProductAsync(parameter);
 
         // Assert
         Assert.Multiple(
@@ -193,7 +170,7 @@ public class ProductServiceTests
             () => Assert.Equal(parameter.Description, product.Description),
             () => Assert.Equal(parameter.Price, product.Price),
             () => Assert.Equal(parameter.Stock, product.Stock),
-            () => repo.Verify(r => r.Update(product), Times.Once),
-            () => repo.Verify(r => r.SaveChangesAsync(), Times.Once));
+            () => _autoMocker.GetMock<IProductRepository>().Verify(r => r.Update(product), Times.Once),
+            () => _autoMocker.GetMock<IProductRepository>().Verify(r => r.SaveChangesAsync(), Times.Once));
     }
 }

@@ -4,7 +4,7 @@ namespace Jurupema.Api.Application.Models;
 
 public record ProductImageListItemResult
 {
-    public int Id { get; }
+    public Guid Id { get; }
     public string Name { get; }
     public string Url { get; }
 

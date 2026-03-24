@@ -12,7 +12,12 @@ public class ProductOrderTypeConfiguration : IEntityTypeConfiguration<ProductOrd
     {
         builder.ToTable("ProductOrder");
         builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id).ValueGeneratedNever();
         builder.Property(e => e.ProductId).IsRequired();
+        builder.HasOne(e => e.Product)
+            .WithMany()
+            .HasForeignKey(e => e.ProductId)
+            .OnDelete(DeleteBehavior.Restrict);
         builder.Property(e => e.Quantity).IsRequired().HasDefaultValue(1);
         builder.Property(e => e.TotalPrice).IsRequired().HasColumnType("decimal(18,2)");
         builder.Property(e => e.CreatedAt).IsRequired().HasDefaultValueSql("GETDATE()");
@@ -44,9 +49,11 @@ public class ProductTypeConfiguration : IEntityTypeConfiguration<Product>
     {
         builder.ToTable("Product");
         builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id).ValueGeneratedNever();
         builder.Property(e => e.Name).IsRequired().HasMaxLength(200);
         builder.Property(e => e.Description).HasMaxLength(1000);
         builder.Property(e => e.Price).IsRequired().HasColumnType("decimal(18,2)");
+        builder.Property(e => e.Stock).IsRequired();
     }
 }
 
@@ -56,6 +63,7 @@ public class ProductImageTypeConfiguration : IEntityTypeConfiguration<ProductIma
     {
         builder.ToTable("ProductImage");
         builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id).ValueGeneratedNever();
         builder.Property(e => e.Name).IsRequired().HasMaxLength(200);
         builder.HasOne(e => e.Product)
             .WithMany(p => p.ProductImages)

@@ -36,8 +36,8 @@ public static class ProductEndpoints
             .WithDescription("Creates a new product")
             .WithTags("product");
 
-        group.MapPut("/{id:int}", async (
-                int id,
+        group.MapPut("/{id:guid}", async (
+                Guid id,
                 [FromBody] UpdateProductRequest request,
                 [FromServices] ProductService productService) =>
             {

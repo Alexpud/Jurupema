@@ -7,12 +7,11 @@ public static class ProductImageEndpoints
 {
     public static RouteGroupBuilder MapProductImageEndpoints(this IEndpointRouteBuilder endpointBuilder)
     {
-        var group = endpointBuilder.MapGroup("/{productId}/image");
+        var group = endpointBuilder.MapGroup("/{productId:guid}/image");
 
-
-        group.MapDelete("/{productImageId:int}", async (
-                [FromRoute] int productId,
-                [FromRoute] int productImageId,
+        group.MapDelete("/{productImageId:guid}", async (
+                [FromRoute] Guid productId,
+                [FromRoute] Guid productImageId,
                 [FromServices] ProductImageService productImageService,
                 CancellationToken cancellationToken) =>
             {
@@ -25,7 +24,7 @@ public static class ProductImageEndpoints
                 "Removes the image row for this product and deletes the blob from storage. Returns 204 when successful.")
             .WithTags("product");
 
-        group.MapPost("/", async ([FromRoute] int productId, [FromServices] ProductImageService productImageService, IFormFile file) =>
+        group.MapPost("/", async ([FromRoute] Guid productId, [FromServices] ProductImageService productImageService, IFormFile file) =>
         {
             await productImageService.UploadProductImageAsync(productId, file.FileName, file.OpenReadStream());
             return Results.Ok();

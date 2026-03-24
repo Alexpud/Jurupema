@@ -16,7 +16,7 @@ public abstract class BaseRepository<T>(JurupemaDbContext context) : IBaseReposi
     public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>> predicate) =>
         await context.Set<T>().Where(predicate).ToListAsync();
 
-    public async Task<T> GetByIdAsync(int id, Expression<Func<T, object>> include = null)
+    public async Task<T> GetByIdAsync(Guid id, Expression<Func<T, object>> include = null)
     {
         var query = context.Set<T>().AsQueryable();
         if (include != null)
