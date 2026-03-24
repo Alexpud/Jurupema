@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using Jurupema.Api.Application.Models;
 using Jurupema.Api.Application.Products;
 using Jurupema.Api.Application.Storage;
@@ -30,6 +30,7 @@ public static class ServiceExtensions
 
         // Application
         builder.Services.AddScoped<ProductService>();
+        builder.Services.AddScoped<ProductImageService>();
         builder.Services.AddValidatorsFromAssemblyContaining<CreateProductParameterValidator>();
 
         return builder;

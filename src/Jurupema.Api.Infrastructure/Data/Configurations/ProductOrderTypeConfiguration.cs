@@ -1,4 +1,4 @@
-﻿using Jurupema.Api.Domain.Entities;
+using Jurupema.Api.Domain.Entities;
 using Jurupema.Api.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -56,7 +56,6 @@ public class ProductImageTypeConfiguration : IEntityTypeConfiguration<ProductIma
     {
         builder.ToTable("ProductImage");
         builder.HasKey(e => e.Id);
-        builder.Property(e => e.Url).IsRequired().HasMaxLength(200);
         builder.Property(e => e.Name).IsRequired().HasMaxLength(200);
         builder.HasOne(e => e.Product)
             .WithMany(p => p.ProductImages)

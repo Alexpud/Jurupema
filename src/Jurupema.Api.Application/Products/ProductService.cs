@@ -9,6 +9,36 @@ namespace Jurupema.Api.Application.Products;
 
 public class ProductService(IStorageClient storageClient, IProductRepository productRepository)
 {
+    public async Task<PagedResult<ProductListItemResult>> QueryProductsAsync(
+        QueryProductsParameters parameters,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(parameters.PageIndex);
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(parameters.PageSize, 0);
+
+        var (items, totalCount) = await productRepository.GetPagedAsync(
+            parameters.NameFilter,
+            parameters.SortBy,
+            parameters.SortDirection,
+            parameters.PageIndex,
+            parameters.PageSize,
+            parameters.IncludeImages,
+            cancellationToken);
+
+        var totalPages = (int)Math.Ceiling(totalCount / (double)parameters.PageSize);
+        var dtoItems = await Task.WhenAll(
+            items.Select(p => MapToListItemAsync(p, parameters.IncludeImages, storageClient, cancellationToken)));
+
+        return new PagedResult<ProductListItemResult>
+        {
+            Items = dtoItems.ToList(),
+            PageIndex = parameters.PageIndex,
+            PageSize = parameters.PageSize,
+            TotalCount = totalCount,
+            TotalPages = totalPages
+        };
+    }
+
     public async Task<CreateProductResult> CreateProduct(CreateProductParameter parameter)
     {
         // Verify if a product with the same name already exists
@@ -34,18 +64,32 @@ public class ProductService(IStorageClient storageClient, IProductRepository pro
         await productRepository.SaveChangesAsync();
     }
 
-    public async Task UploadProductImageAsync(int productId, string fileName, Stream fileStream)
+    private static async Task<ProductListItemResult> MapToListItemAsync(
+        Product product,
+        bool includeImages,
+        IStorageClient storageClient,
+        CancellationToken cancellationToken)
     {
-        var product = await productRepository.GetByIdAsync(productId, p => p.ProductImages)
-            ?? throw new ProductNotFoundException(productId);
+        IReadOnlyList<ProductImageListItemResult> images;
+        if (!includeImages)
+        {
+            images = [];
+        }
+        else
+        {
+            var list = new List<ProductImageListItemResult>();
+            foreach (var img in product.ProductImages)
+            {
+                var url = await storageClient.GetTemporaryReadUrlAsync(
+                    img.Name,
+                    TimeSpan.FromMinutes(10),
+                    cancellationToken);
+                list.Add(new ProductImageListItemResult(img, url));
+            }
 
-        string url = "";
-        var productImage = new ProductImage(product.Id, fileName, url);
-        if (product.AlreadyHasImage(productImage))
-            throw new DuplicateProductImageException(fileName);
+            images = list;
+        }
 
-        
-        await storageClient.UploadFileAsync(fileStream, fileName);
-        await productRepository.SaveChangesAsync();
+        return ProductListItemResult.FromProduct(product, images);
     }
 }

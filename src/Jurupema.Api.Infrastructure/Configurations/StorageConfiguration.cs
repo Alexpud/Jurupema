@@ -1,4 +1,4 @@
-﻿namespace Jurupema.Api.Infrastructure.Configurations;
+namespace Jurupema.Api.Infrastructure.Configurations;
 
 
 public class StorageConfiguration

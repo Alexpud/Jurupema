@@ -1,13 +1,20 @@
+using System.Text.Json.Serialization;
 using Jurupema.Api.Apis;
 using Jurupema.Api.Application.Storage;
 using Jurupema.Api.Infrastructure;
 using Jurupema.Api.Infrastructure.Storage;
+using Jurupema.Api.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSingleton<IStorageClient, BlobStorageClient>();
+
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -16,6 +23,7 @@ builder.Services.AddSwaggerGen(options =>
         Title = "Jurupema API",
         Version = "v1"
     });
+    options.SchemaFilter<EnumAsStringSchemaFilter>();
 });
 
 builder.Services.AddAntiforgery();

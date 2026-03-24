@@ -18,18 +18,13 @@ public class Product(string name, string description, decimal price) : BaseEntit
         UpdatedAt = DateTime.UtcNow;
     }
 
-    public bool TryAddImage(string fileName, string url)
+    public bool TryAddImage(string fileName)
     {
-        var alreadyHasImage = ProductImages.Any(p => p.Url.Equals(url));
+        var alreadyHasImage = ProductImages.Any(p => p.Name.Equals(fileName));
         if (alreadyHasImage)
             return false;
-        
-        ProductImages.Add(new ProductImage(Id, fileName, url));
-        return true;
-    }
 
-    public bool AlreadyHasImage(ProductImage productImage)
-    {
-        return ProductImages.Any(p => p.Url.Equals(productImage));
+        ProductImages.Add(new ProductImage(Id, fileName));
+        return true;
     }
 }
