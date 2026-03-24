@@ -19,6 +19,7 @@ public static class ProductEndpoints
                 var result = await productService.QueryProductsAsync(parameters, cancellationToken);
                 return Results.Ok(result);
             })
+            .Produces<OkResult>(StatusCodes.Status200OK)
             .WithFluentValidation<QueryProductsParameters>()
             .WithSummary("Lists products with optional name filter, sorting, paging, and optional image inclusion")
             .WithDescription("Lists products with optional name filter, sorting, paging, and optional image inclusion")
@@ -29,6 +30,7 @@ public static class ProductEndpoints
             var result = await productService.CreateProduct(request);
             return Results.Created($"/products/{result.Id}", result);
         })
+            .Produces<CreatedResult>(StatusCodes.Status201Created)
             .WithFluentValidation<CreateProductParameter>()
             .WithSummary("Creates a new product")
             .WithDescription("Creates a new product")
@@ -49,6 +51,7 @@ public static class ProductEndpoints
                 });
                 return Results.NoContent();
             })
+            .Produces<NoContentResult>(StatusCodes.Status204NoContent)
             .WithFluentValidation<UpdateProductRequest>()
             .WithSummary("Updates an existing product")
             .WithDescription("Updates an existing product")

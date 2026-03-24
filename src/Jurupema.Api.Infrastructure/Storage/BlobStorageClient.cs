@@ -29,6 +29,13 @@ public class BlobStorageClient : IStorageClient
         await containerClient.UploadBlobAsync(fileName, file);
     }
 
+    public async Task DeleteFileAsync(string fileName, CancellationToken cancellationToken = default)
+    {
+        var containerClient = _blobServiceClient.GetBlobContainerClient(_blobStorageConfig.ContainerName);
+        var blobClient = containerClient.GetBlobClient(fileName);
+        await blobClient.DeleteIfExistsAsync(cancellationToken: cancellationToken);
+    }
+
     public async Task<string> GetTemporaryReadUrlAsync(string fileName, TimeSpan lifetime, CancellationToken cancellationToken = default)
     {
         if (!_blobStorageConfig.Enabled)

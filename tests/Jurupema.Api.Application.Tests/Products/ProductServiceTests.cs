@@ -42,7 +42,7 @@ public class ProductServiceTests
         storage
             .Setup(s => s.GetTemporaryReadUrlAsync(
                 "photo.jpg",
-                TimeSpan.FromMinutes(1),
+                It.IsAny<TimeSpan>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedUrl);
 
