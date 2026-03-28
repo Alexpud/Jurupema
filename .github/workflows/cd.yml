@@ -51,15 +51,3 @@ jobs:
         tags: |
           spudin/jurupema.api:latest
           spudin/jurupema.api:${{ github.sha }}
-
-    # Required secret: AZURE_CREDENTIALS (service principal with Contributor on the app or resource group)
-    - name: Azure Login
-      uses: azure/login@v2
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-    - name: Deploy container to Azure App Service
-      uses: azure/webapps-deploy@v3
-      with:
-        app-name: jurupema-api
-        images: spudin/jurupema.api:${{ github.sha }}
