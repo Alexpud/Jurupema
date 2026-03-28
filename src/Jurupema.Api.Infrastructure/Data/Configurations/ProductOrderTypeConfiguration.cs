@@ -1,10 +1,8 @@
 using Jurupema.Api.Domain.Entities;
-using Jurupema.Api.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Jurupema.Api.Infrastructure.Data.Configurations;
-
 
 public class ProductOrderTypeConfiguration : IEntityTypeConfiguration<ProductOrder>
 {
@@ -12,62 +10,19 @@ public class ProductOrderTypeConfiguration : IEntityTypeConfiguration<ProductOrd
     {
         builder.ToTable("ProductOrder");
         builder.HasKey(e => e.Id);
-        builder.Property(e => e.Id).ValueGeneratedNever();
+        builder.Property(e => e.OrderId).IsRequired();
         builder.Property(e => e.ProductId).IsRequired();
+        builder.Property(e => e.Price).IsRequired().HasColumnType("decimal(18,2)");
+        builder.Property(e => e.CreatedAt).IsRequired();
+
+        builder.HasOne(e => e.Order)
+            .WithMany(o => o.ProductOrders)
+            .HasForeignKey(e => e.OrderId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         builder.HasOne(e => e.Product)
-            .WithMany()
+            .WithMany(p => p.ProductOrders)
             .HasForeignKey(e => e.ProductId)
             .OnDelete(DeleteBehavior.Restrict);
-        builder.Property(e => e.Quantity).IsRequired().HasDefaultValue(1);
-        builder.Property(e => e.TotalPrice).IsRequired().HasColumnType("decimal(18,2)");
-        builder.Property(e => e.CreatedAt).IsRequired().HasDefaultValueSql("GETDATE()");
-        builder.Property(e => e.UpdatedAt);
-
-        builder.Property(e => e.Status)
-            .IsRequired()
-            .HasDefaultValue(ProductOrderStatus.Pending)
-            .HasConversion<string>();
-
-        builder.Property(e => e.PaymentMethod)
-            .IsRequired()
-            .HasConversion<string>();
-
-        builder.Property(e => e.PaymentStatus)
-            .IsRequired()
-            .HasConversion<string>();
-
-        builder.Property(e => e.PaymentLink).IsRequired().HasMaxLength(200);
-        builder.Property(e => e.PaymentLinkExpiration).IsRequired().HasMaxLength(200);
-        builder.Property(e => e.PaymentLinkQrCode).IsRequired().HasMaxLength(200);
-        builder.Property(e => e.PaymentLinkQrCodeExpiration).IsRequired().HasMaxLength(200);
-    }
-}
-
-public class ProductTypeConfiguration : IEntityTypeConfiguration<Product>
-{
-    public void Configure(EntityTypeBuilder<Product> builder)
-    {
-        builder.ToTable("Product");
-        builder.HasKey(e => e.Id);
-        builder.Property(e => e.Id).ValueGeneratedNever();
-        builder.Property(e => e.Name).IsRequired().HasMaxLength(200);
-        builder.Property(e => e.Description).HasMaxLength(1000);
-        builder.Property(e => e.Price).IsRequired().HasColumnType("decimal(18,2)");
-        builder.Property(e => e.Stock).IsRequired();
-    }
-}
-
-public class ProductImageTypeConfiguration : IEntityTypeConfiguration<ProductImage>
-{
-    public void Configure(EntityTypeBuilder<ProductImage> builder)
-    {
-        builder.ToTable("ProductImage");
-        builder.HasKey(e => e.Id);
-        builder.Property(e => e.Id).ValueGeneratedNever();
-        builder.Property(e => e.Name).IsRequired().HasMaxLength(200);
-        builder.HasOne(e => e.Product)
-            .WithMany(p => p.ProductImages)
-            .HasForeignKey(e => e.ProductId)
-            .OnDelete(DeleteBehavior.Cascade);
     }
 }

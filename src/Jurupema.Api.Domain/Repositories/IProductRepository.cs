@@ -5,6 +5,8 @@ namespace Jurupema.Api.Domain.Repositories;
 
 public interface IProductRepository : IBaseRepository<Product>
 {
+    Task<IReadOnlyList<Product>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default);
+
     Task<(IReadOnlyList<Product> Items, int TotalCount)> GetPagedAsync(
         string nameContains,
         ProductSortBy sortBy,

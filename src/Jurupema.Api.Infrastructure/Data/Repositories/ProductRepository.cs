@@ -11,6 +11,15 @@ public class ProductRepository : BaseRepository<Product>, IProductRepository
     {
     }
 
+    public async Task<IReadOnlyList<Product>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
+    {
+        var idList = ids.Distinct().ToList();
+        if (idList.Count == 0)
+            return [];
+
+        return await DbSet.Where(p => idList.Contains(p.Id)).ToListAsync(cancellationToken);
+    }
+
     public async Task<(IReadOnlyList<Product> Items, int TotalCount)> GetPagedAsync(
         string nameContains,
         ProductSortBy sortBy,

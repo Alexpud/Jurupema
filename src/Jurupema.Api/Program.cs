@@ -46,6 +46,7 @@ await app.RunMigrationsAsync();
 app.UseHttpsRedirection();
 
 app.MapProductEndpoints();
+app.MapOrderEndpoints();
 app.MapProductImageEndpoints();
 app.UseAntiforgery();
 

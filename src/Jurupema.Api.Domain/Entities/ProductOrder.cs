@@ -1,25 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Jurupema.Api.Domain.Enums;
+using Jurupema.Api.Domain;
 
 namespace Jurupema.Api.Domain.Entities;
 
-public class ProductOrder
+public class ProductOrder(Guid orderId, Guid productId, decimal price) : BaseEntity
 {
-    public Guid Id { get; private set; } = Guid.NewGuid();
-    public Guid ProductId { get; private set; }
-    public Product Product { get; set; }
-    public int Quantity { get; private set; }
-    public decimal TotalPrice { get; private set; }
-    public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
-    public DateTime? UpdatedAt { get; private set; }
-    public ProductOrderStatus Status { get; set; }
-    public PaymentMethod PaymentMethod { get; private set; }
-    public PaymentStatus PaymentStatus { get; private set; }
-    public string PaymentLink { get; private set; }
-    public string PaymentLinkExpiration { get; private set; }
-    public string PaymentLinkQrCode { get; private set; }
-    public string PaymentLinkQrCodeExpiration { get; private set; }
+    public Guid OrderId { get; private set; } = Guards.ThrowIfDefault(orderId, nameof(orderId));
+    public Order Order { get; internal set; }
+    public Guid ProductId { get; private set; } = Guards.ThrowIfDefault(productId, nameof(productId));
+    public Product Product { get; internal set; }
+    public decimal Price { get; private set; } = Guards.ThrowIfNegative(price, nameof(price));
 }

@@ -1,6 +1,7 @@
 using FluentValidation;
 using Jurupema.Api.Application.Models;
-using Jurupema.Api.Application.Products;
+using Jurupema.Api.Application.Services.Orders;
+using Jurupema.Api.Application.Services.Products;
 using Jurupema.Api.Application.Storage;
 using Jurupema.Api.Domain.Repositories;
 using Jurupema.Api.Infrastructure.Configurations;
@@ -22,14 +23,26 @@ public static class ServiceExtensions
     {
         // Infra
         builder.Services.AddDbContext<JurupemaDbContext>(options =>
-            options.UseSqlServer(builder.Configuration.GetConnectionString("database")));
+        {
+            if (builder.Configuration.GetValue<bool>("Database:UseInMemory"))
+            {
+                var name = builder.Configuration["Database:InMemoryDatabaseName"] ?? "JurupemaInMemory";
+                options.UseInMemoryDatabase(name);
+            }
+            else
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("database"));
+            }
+        });
         builder.Services.Configure<StorageConfiguration>(builder.Configuration.GetSection(StorageConfiguration.Position));
         builder.Services.AddSingleton<IStorageClient, BlobStorageClient>();
         builder.Services.AddScoped<IProductRepository, ProductRepository>();
+        builder.Services.AddScoped<IOrderRepository, OrderRepository>();
         builder.AddServiceDefaults();
 
         // Application
         builder.Services.AddScoped<ProductService>();
+        builder.Services.AddScoped<OrderService>();
         builder.Services.AddScoped<ProductImageService>();
         builder.Services.AddValidatorsFromAssemblyContaining<CreateProductParameterValidator>();
 
@@ -40,6 +53,7 @@ public static class ServiceExtensions
     {
         using var scope = builder.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<JurupemaDbContext>();
-        await dbContext.Database.MigrateAsync();
+        if (dbContext.Database.IsRelational())
+            await dbContext.Database.MigrateAsync();
     }
 }

@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using Jurupema.Api.Application.Exceptions;
 using Jurupema.Api.Application.Models;
-using Jurupema.Api.Application.Products;
+using Jurupema.Api.Application.Services.Products;
 using Jurupema.Api.Application.Storage;
 using Jurupema.Api.Application.Tests.Builders;
 using Jurupema.Api.Domain;
