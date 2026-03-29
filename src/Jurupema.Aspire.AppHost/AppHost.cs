@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using Aspire.Hosting.Azure;
 using Projects;
 
 var builder = DistributedApplication.CreateBuilder(args);
@@ -11,9 +11,18 @@ var database = builder.AddSqlServer("jurupema-sqlServer", password: password)
     .WithLifetime(ContainerLifetime.Persistent)
     .AddDatabase("database");
 
+var serviceBus = builder.AddAzureServiceBus("messaging")
+    .RunAsEmulator();
+
+var orderCreatedTopic = serviceBus.AddServiceBusTopic("sbt-jurupema-order-created");
+orderCreatedTopic.AddServiceBusSubscription("order-created-consumer", "sbts-jurupema-order-created");
+
 builder.AddProject<Jurupema_Api>("jurupema-api")
     .WithReference(database)
-    .WaitFor(database);
+    .WithReference(serviceBus)
+    .WaitFor(database)
+    .WaitFor(serviceBus)
+    .WithEnvironment("ServiceBus__Enabled", "true");
 
 
 builder.Build().Run();

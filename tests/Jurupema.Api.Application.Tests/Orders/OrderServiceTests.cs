@@ -1,4 +1,5 @@
 using Jurupema.Api.Application.Exceptions;
+using Jurupema.Api.Application.Messaging;
 using Jurupema.Api.Application.Models;
 using Jurupema.Api.Application.Services.Orders;
 using Jurupema.Api.Application.Tests.Builders;
@@ -12,12 +13,17 @@ namespace Jurupema.Api.Application.Tests.Orders;
 
 public class OrderServiceTests
 {
+    private const string OrderCreatedTopic = "sbt-jurupema-order-created";
+
     private readonly AutoMocker _autoMocker;
     private readonly OrderService _sut;
 
     public OrderServiceTests()
     {
         _autoMocker = new AutoMocker();
+        _autoMocker.GetMock<IOrderServiceBusTopics>()
+            .Setup(t => t.OrderCreated)
+            .Returns(OrderCreatedTopic);
         _sut = _autoMocker.CreateInstance<OrderService>();
     }
 
@@ -46,6 +52,14 @@ public class OrderServiceTests
         // Assert
         var ex = await Assert.ThrowsAsync<ProductNotFoundException>(act);
         Assert.Equal(missingId, ex.ProductId);
+        _autoMocker.GetMock<ITopicMessagePublisher>()
+            .Verify(
+                p => p.PublishAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<OrderCreatedMessage>(),
+                    It.IsAny<CancellationToken>()),
+                Times.Never);
     }
 
     [Fact]
@@ -106,5 +120,14 @@ public class OrderServiceTests
             () => Assert.Equal("https://pay.example/pix", captured.PaymentLink),
             () => Assert.Equal(PaymentMethod.Pix, result.Payment.PaymentMethod),
             () => Assert.Equal(PaymentStatus.Pending, result.Payment.PaymentStatus));
+
+        _autoMocker.GetMock<ITopicMessagePublisher>()
+            .Verify(
+                p => p.PublishAsync(
+                    OrderCreatedTopic,
+                    "OrderCreatedMessage",
+                    It.Is<OrderCreatedMessage>(m => m.OrderId == captured.Id),
+                    It.IsAny<CancellationToken>()),
+                Times.Once);
     }
 }

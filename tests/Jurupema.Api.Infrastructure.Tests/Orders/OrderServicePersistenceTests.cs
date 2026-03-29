@@ -1,10 +1,13 @@
+using Jurupema.Api.Application.Messaging;
 using Jurupema.Api.Application.Models;
 using Jurupema.Api.Application.Services.Orders;
 using Jurupema.Api.Domain.Entities;
 using Jurupema.Api.Domain.Enums;
 using Jurupema.Api.Infrastructure.Data;
 using Jurupema.Api.Infrastructure.Data.Repositories;
+using Jurupema.Api.Infrastructure.Messaging;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Jurupema.Api.Infrastructure.Tests.Orders;
 
@@ -23,7 +26,12 @@ public class OrderServicePersistenceTests
 
         var productRepository = new ProductRepository(context);
         var orderRepository = new OrderRepository(context);
-        var sut = new OrderService(productRepository, orderRepository);
+        var sut = new OrderService(
+            productRepository,
+            orderRepository,
+            new NoOpTopicMessagePublisher(),
+            new FixedOrderServiceBusTopics(),
+            NullLogger<OrderService>.Instance);
 
         var productA = new Product("A", "da", 4m);
         var productB = new Product("B", "db", 2.5m);
@@ -65,5 +73,10 @@ public class OrderServicePersistenceTests
             () => Assert.Equal(PaymentMethod.BankTransfer, orderEntity.PaymentMethod),
             () => Assert.Equal(PaymentStatus.Pending, orderEntity.PaymentStatus),
             () => Assert.Equal(PaymentMethod.BankTransfer, result.Payment.PaymentMethod));
+    }
+
+    private sealed class FixedOrderServiceBusTopics : IOrderServiceBusTopics
+    {
+        public string OrderCreated => "sbt-jurupema-order-created";
     }
 }

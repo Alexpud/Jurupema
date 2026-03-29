@@ -1,5 +1,9 @@
 # Agent / contributor notes (Jurupema)
 
+## Tokenized log
+
+Use tokenized log so that tools are able to group and select parts of the log. Ex: "Message={Message}; OrderId={OrderId}"
+
 ## .NET projects: nullable reference types
 
 Do not enable nullable in dotnet core projects

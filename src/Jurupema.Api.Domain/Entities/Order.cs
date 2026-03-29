@@ -46,4 +46,7 @@ public class Order(
 
     private void RecalculateTotal() =>
         TotalPrice = ProductOrders.Sum(l => l.Price);
+
+    public void MarkAsPaid() =>
+        Status = ProductOrderStatus.Paid;
 }
