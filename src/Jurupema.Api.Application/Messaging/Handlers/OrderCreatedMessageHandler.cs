@@ -1,8 +1,8 @@
-using Jurupema.Api.Application.Messaging;
+using Jurupema.Api.Application.Models;
 using Jurupema.Api.Domain.Repositories;
 using Microsoft.Extensions.Logging;
 
-namespace Jurupema.Api.Application.Services.Orders;
+namespace Jurupema.Api.Application.Messaging.Handlers;
 
 public class OrderCreatedMessageHandler(
     IOrderRepository orderRepository,

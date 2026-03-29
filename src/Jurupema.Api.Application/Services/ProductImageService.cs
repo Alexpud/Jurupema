@@ -3,7 +3,7 @@ using Jurupema.Api.Application.Storage;
 using Jurupema.Api.Domain.Entities;
 using Jurupema.Api.Domain.Repositories;
 
-namespace Jurupema.Api.Application.Services.Products;
+namespace Jurupema.Api.Application.Services;
 
 public class ProductImageService(IStorageClient storageClient, IProductRepository productRepository)
 {

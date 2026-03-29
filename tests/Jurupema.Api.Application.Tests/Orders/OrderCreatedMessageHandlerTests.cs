@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
-using Jurupema.Api.Application.Messaging;
-using Jurupema.Api.Application.Services.Orders;
+using Jurupema.Api.Application.Messaging.Handlers;
+using Jurupema.Api.Application.Models;
 using Jurupema.Api.Domain.Entities;
 using Jurupema.Api.Domain.Enums;
 using Jurupema.Api.Domain.Repositories;

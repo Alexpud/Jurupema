@@ -1,7 +1,7 @@
 using Jurupema.Api.Application.Exceptions;
 using Jurupema.Api.Application.Messaging;
 using Jurupema.Api.Application.Models;
-using Jurupema.Api.Application.Services.Orders;
+using Jurupema.Api.Application.Services;
 using Jurupema.Api.Application.Tests.Builders;
 using Jurupema.Api.Domain.Entities;
 using Jurupema.Api.Domain.Enums;

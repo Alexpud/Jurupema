@@ -5,7 +5,7 @@ using Jurupema.Api.Domain.Entities;
 using Jurupema.Api.Domain.Repositories;
 using Microsoft.Extensions.Logging;
 
-namespace Jurupema.Api.Application.Services.Orders;
+namespace Jurupema.Api.Application.Services;
 
 public class OrderService(
     IProductRepository productRepository,

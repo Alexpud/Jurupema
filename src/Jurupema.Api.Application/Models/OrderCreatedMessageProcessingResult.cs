@@ -1,4 +1,4 @@
-namespace Jurupema.Api.Application.Messaging;
+namespace Jurupema.Api.Application.Models;
 
 public enum OrderCreatedMessageProcessingResult
 {

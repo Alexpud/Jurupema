@@ -1,9 +1,9 @@
 using Azure.Messaging.ServiceBus;
 using FluentValidation;
 using Jurupema.Api.Application.Messaging;
+using Jurupema.Api.Application.Messaging.Handlers;
 using Jurupema.Api.Application.Models;
-using Jurupema.Api.Application.Services.Orders;
-using Jurupema.Api.Application.Services.Products;
+using Jurupema.Api.Application.Services;
 using Jurupema.Api.Application.Storage;
 using Jurupema.Api.Domain.Repositories;
 using Jurupema.Api.Infrastructure.Configurations;

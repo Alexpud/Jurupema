@@ -1,3 +1,3 @@
-namespace Jurupema.Api.Application.Messaging;
+namespace Jurupema.Api.Application.Models;
 
 public record OrderCreatedMessage(Guid OrderId);

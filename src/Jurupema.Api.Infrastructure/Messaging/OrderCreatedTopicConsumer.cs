@@ -2,6 +2,8 @@ using System.Diagnostics;
 using System.Text.Json;
 using Azure.Messaging.ServiceBus;
 using Jurupema.Api.Application.Messaging;
+using Jurupema.Api.Application.Messaging.Handlers;
+using Jurupema.Api.Application.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
