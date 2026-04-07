@@ -9,6 +9,7 @@ using Jurupema.Api.Infrastructure.Data;
 using Jurupema.Api.Integration.Tests.Support;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Jurupema.Api.Integration.Tests.Orders;
 
@@ -82,5 +83,46 @@ public class OrderEndpointsTests : IClassFixture<ApiWebApplicationFactory>
             () => Assert.Equal(11m, orderInDb.TotalPrice),
             () => Assert.Equal(PaymentMethod.CreditCard, orderInDb.PaymentMethod),
             () => Assert.Equal(PaymentStatus.Pending, orderInDb.PaymentStatus));
+    }
+
+    [Fact]
+    public async Task Post_orders_when_product_not_found_returns_400_problemdetails_with_code()
+    {
+        // Arrange
+        var client = _factory.CreateClient();
+        var request = new CreateOrderParameter
+        {
+            Products =
+            [
+                new CreateOrderLineItem
+                {
+                    ProductId = Guid.Parse("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"),
+                    Quantity = 1
+                }
+            ],
+            Payment = new CreateOrderPaymentInfo
+            {
+                PaymentMethod = PaymentMethod.Cash,
+                PaymentStatus = PaymentStatus.Pending
+            }
+        };
+
+        // Act
+        var response = await client.PostAsJsonAsync("/orders", request, TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+
+        var hasCode = problem.Extensions.TryGetValue("code", out var codeObj);
+
+        Assert.Multiple(
+            () => Assert.Equal(400, problem.Status),
+            () => Assert.Equal("Domain validation error", problem.Title),
+            () => Assert.False(string.IsNullOrWhiteSpace(problem.Detail)),
+            () => Assert.True(hasCode),
+            () => Assert.Equal("product_not_found", codeObj?.ToString()));
     }
 }

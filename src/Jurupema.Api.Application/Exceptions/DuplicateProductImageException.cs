@@ -1,9 +1,9 @@
 namespace Jurupema.Api.Application.Exceptions;
 
-public sealed class DuplicateProductImageException : Exception
+public sealed class DuplicateProductImageException : DomainException
 {
     public DuplicateProductImageException(string fileName)
-        : base($"The product already has an image for '{fileName}'.")
+        : base("duplicate_product_image", $"The product already has an image for '{fileName}'.")
     {
         FileName = fileName;
     }

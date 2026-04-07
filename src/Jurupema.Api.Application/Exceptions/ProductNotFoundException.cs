@@ -1,9 +1,9 @@
 namespace Jurupema.Api.Application.Exceptions;
 
-public sealed class ProductNotFoundException : Exception
+public sealed class ProductNotFoundException : DomainException
 {
     public ProductNotFoundException(Guid productId)
-        : base($"Product with id {productId} was not found.")
+        : base("product_not_found", $"Product with id {productId} was not found.")
     {
         ProductId = productId;
     }

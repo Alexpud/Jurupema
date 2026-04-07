@@ -9,7 +9,8 @@ public static class OrderEndpoints
 {
     public static RouteGroupBuilder MapOrderEndpoints(this IEndpointRouteBuilder endpointBuilder)
     {
-        var group = endpointBuilder.MapGroup("/orders");
+        var group = endpointBuilder.MapGroup("/orders")
+            .WithDomainExceptionHandling();
 
         group.MapPost("/", async (
                 [FromBody] CreateOrderParameter request,

@@ -9,7 +9,8 @@ public static class ProductEndpoints
 {
     public static RouteGroupBuilder MapProductEndpoints(this IEndpointRouteBuilder endpointBuilder)
     {
-        var group = endpointBuilder.MapGroup("/products");
+        var group = endpointBuilder.MapGroup("/products")
+            .WithDomainExceptionHandling();
 
         group.MapGet("/", async (
                 [AsParameters] QueryProductsParameters parameters,

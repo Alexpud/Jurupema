@@ -1,4 +1,5 @@
 using Jurupema.Api.Application.Services;
+using Jurupema.Api.Filters;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Jurupema.Api.Apis;
@@ -7,7 +8,8 @@ public static class ProductImageEndpoints
 {
     public static RouteGroupBuilder MapProductImageEndpoints(this IEndpointRouteBuilder endpointBuilder)
     {
-        var group = endpointBuilder.MapGroup("/{productId:guid}/image");
+        var group = endpointBuilder.MapGroup("/{productId:guid}/image")
+            .WithDomainExceptionHandling();
 
         group.MapDelete("/{productImageId:guid}", async (
                 [FromRoute] Guid productId,
