@@ -1,3 +1,4 @@
+using Azure.Identity;
 using Azure.Messaging.ServiceBus;
 using Jurupema.Api.Application.Messaging;
 using Jurupema.Api.Infrastructure.Configurations;
@@ -15,10 +16,13 @@ internal static class ServiceBusMessagingRegistration
         var serviceBusBootstrap = serviceBusSection.Get<ServiceBusConfiguration>() ?? new ServiceBusConfiguration();
         if (IsEnabled(builder.Configuration, serviceBusBootstrap))
         {
-            var connectionString = ResolveConnectionString(
-                builder.Configuration,
-                serviceBusBootstrap);
-            builder.Services.AddSingleton(_ => new ServiceBusClient(connectionString));
+            var connectionString = builder.Configuration.GetConnectionString("serviceBus");
+
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Development")
+                builder.Services.AddSingleton(_ => new ServiceBusClient(connectionString, new DefaultAzureCredential()));
+            else
+                builder.Services.AddSingleton(_ => new ServiceBusClient(connectionString));
+                
             builder.Services.AddSingleton<AzureServiceBusTopicMessagePublisher>();
             builder.Services.AddSingleton<ITopicMessagePublisher>(sp =>
                 sp.GetRequiredService<AzureServiceBusTopicMessagePublisher>());
@@ -32,15 +36,7 @@ internal static class ServiceBusMessagingRegistration
 
     public static bool IsEnabled(IConfiguration configuration, ServiceBusConfiguration options)
     {
-        return options.Enabled && !string.IsNullOrWhiteSpace(ResolveConnectionString(configuration, options));
+        return options.Enabled && !string.IsNullOrWhiteSpace(configuration.GetConnectionString("serviceBus"));
     }
 
-    public static string ResolveConnectionString(IConfiguration configuration, ServiceBusConfiguration options)
-    {
-        var connectionString = options.ConnectionString;
-        if (string.IsNullOrWhiteSpace(connectionString))
-            connectionString = configuration.GetConnectionString("messaging");
-
-        return string.IsNullOrWhiteSpace(connectionString) ? null : connectionString;
-    }
 }

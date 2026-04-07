@@ -16,8 +16,6 @@ public class ServiceBusConfiguration
 
     public bool Enabled { get; set; }
 
-    public string ConnectionString { get; set; }
-
     public ServiceBusTopicsOptions Topics { get; set; } = new();
 
     public ServiceBusSubscriptionsOptions Subscriptions { get; set; } = new();

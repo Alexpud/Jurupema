@@ -11,11 +11,11 @@ var database = builder.AddSqlServer("jurupema-sqlServer", password: password)
     .WithLifetime(ContainerLifetime.Persistent)
     .AddDatabase("database");
 
-var serviceBus = builder.AddAzureServiceBus("messaging")
+var serviceBus = builder.AddAzureServiceBus("serviceBus")
     .RunAsEmulator();
 
 var orderCreatedTopic = serviceBus.AddServiceBusTopic("sbt-jurupema-order-created");
-orderCreatedTopic.AddServiceBusSubscription("order-created-consumer", "sbts-jurupema-order-created");
+orderCreatedTopic.AddServiceBusSubscription("order-created-consumer", "sbs-jurupema");
 
 builder.AddProject<Jurupema_Api>("jurupema-api")
     .WithReference(database)
