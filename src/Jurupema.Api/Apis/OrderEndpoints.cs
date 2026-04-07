@@ -1,5 +1,5 @@
 using Jurupema.Api.Application.Models;
-using Jurupema.Api.Application.Services.Orders;
+using Jurupema.Api.Application.Services;
 using Jurupema.Api.Filters;
 using Microsoft.AspNetCore.Mvc;
 

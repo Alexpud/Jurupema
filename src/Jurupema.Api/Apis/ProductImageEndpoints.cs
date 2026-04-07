@@ -1,4 +1,4 @@
-using Jurupema.Api.Application.Services.Products;
+using Jurupema.Api.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Jurupema.Api.Apis;

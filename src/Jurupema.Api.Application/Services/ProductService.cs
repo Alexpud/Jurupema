@@ -5,7 +5,7 @@ using Jurupema.Api.Domain.Entities;
 using Jurupema.Api.Domain.Repositories;
 using Jurupema.Api.Domain.Specifications;
 
-namespace Jurupema.Api.Application.Services.Products;
+namespace Jurupema.Api.Application.Services;
 
 public class ProductService(IStorageClient storageClient, IProductRepository productRepository)
 {

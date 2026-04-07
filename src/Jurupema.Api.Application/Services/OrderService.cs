@@ -1,11 +1,18 @@
 using Jurupema.Api.Application.Exceptions;
+using Jurupema.Api.Application.Messaging;
 using Jurupema.Api.Application.Models;
 using Jurupema.Api.Domain.Entities;
 using Jurupema.Api.Domain.Repositories;
+using Microsoft.Extensions.Logging;
 
-namespace Jurupema.Api.Application.Services.Orders;
+namespace Jurupema.Api.Application.Services;
 
-public class OrderService(IProductRepository productRepository, IOrderRepository orderRepository)
+public class OrderService(
+    IProductRepository productRepository,
+    IOrderRepository orderRepository,
+    ITopicMessagePublisher topicMessagePublisher,
+    IOrderServiceBusTopics orderServiceBusTopics,
+    ILogger<OrderService> logger)
 {
     public async Task<CreateOrderResult> CreateOrderAsync(CreateOrderParameter parameter, CancellationToken cancellationToken = default)
     {
@@ -35,6 +42,17 @@ public class OrderService(IProductRepository productRepository, IOrderRepository
 
         orderRepository.Insert(order);
         await orderRepository.SaveChangesAsync();
+
+        logger.LogInformation(
+            "Message={Message}; OrderId={OrderId}",
+            "Order created; publishing OrderCreated message.",
+            order.Id);
+
+        await topicMessagePublisher.PublishAsync(
+            orderServiceBusTopics.OrderCreated,
+            "OrderCreatedMessage",
+            new OrderCreatedMessage(order.Id),
+            cancellationToken);
 
         return CreateOrderResult.FromOrder(order, parameter.Products);
     }
